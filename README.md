@@ -1,12 +1,12 @@
 # ChatGPT-AutoHotkey-Utility
 
-[✅ Download here](https://github.com/kdalanon/ChatGPT-AutoHotkey-Utility/releases/latest)
+[✅ Download here](https://github.com/IAmStoxe/ChatGPT-AutoHotkey-Utility)
 
 An AutoHotkey script that uses the ChatGPT API to process selected text.
 
-![image](https://github.com/IAmStoxeChatGPT-AutoHotkey-Utility/assets/123705491/d8387e7f-48b6-4e2e-892a-b79bf5c7f4fe)
+![image](https://github.com/kdalanon/ChatGPT-AutoHotkey-Utility/assets/123705491/d8387e7f-48b6-4e2e-892a-b79bf5c7f4fe)
 
-![image](https://github.com/IamStoce/ChatGPT-AutoHotkey-Utility/assets/123705491/65a6739c-1008-48ba-b048-35df129a852c)
+![image](https://github.com/kdalanon/ChatGPT-AutoHotkey-Utility/assets/123705491/65a6739c-1008-48ba-b048-35df129a852c)
 
 ## How to use
 
@@ -15,12 +15,12 @@ An AutoHotkey script that uses the ChatGPT API to process selected text.
 3. Open `ChatGPT AutoHotkey Utility.ahk` using your favorite text editor
 4. Paste your OpenAI API key on the `API_Key` variable
 
-![image](https://github.com/IAmStoxeChatGPT-AutoHotkey-Utility/assets/123705491/f66a888e-3550-48e9-a0e8-397736df02b3)
+![image](https://github.com/kdalanon/ChatGPT-AutoHotkey-Utility/assets/123705491/f66a888e-3550-48e9-a0e8-397736df02b3)
 
 5. Launch `ChatGPT AutoHotkey Utility.ahk`
 6. Highlight a text that you want to process using ChatGPT API and press the `back quote` key to bring up the menu
 
-![image](https://github.com/IAmStoxe/ChatGPT-AutoHotkey-Utility/assets/123705491/7615e7b5-c4f0-4a8f-9608-669a021ac38d)
+![image](https://github.com/kdalanon/ChatGPT-AutoHotkey-Utility/assets/123705491/7615e7b5-c4f0-4a8f-9608-669a021ac38d)
 
 (Image from [emacs.stackexchange.com](https://emacs.stackexchange.com/questions/16749/how-to-set-emacs-to-recognize-backtick-and-tilde-with-a-colemak-keyboard-layout))
 
