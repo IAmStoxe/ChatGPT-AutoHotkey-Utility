@@ -8,24 +8,44 @@ Persistent
 Script Tray Menu
 ====================================================
 */
+#Requires AutoHotkey v2.0
+
 
 TraySetIcon("Icon.ico")
 A_TrayMenu.Delete
 A_TrayMenu.Add("&Debug", Debug)
+A_TrayMenu.Add("&API Key", EnterAPIKey)
 A_TrayMenu.Add("&Reload Script", ReloadScript)
 A_TrayMenu.Add("E&xit", Exit)
 A_IconTip := "ChatGPT AutoHotkey Utility"
 
 ReloadScript(*) {
-	Reload
+    Reload
 }
 
 Debug(*) {
-	ListLines
+    ListLines
+}
+EnterAPIKey(*) {
+    UserAPIKey := InputBox("Enter API Key", "Please enter your OpenAI API Key:")
+
+    ; Check if the user clicked "Cancel" or closed the window.
+    if (UserAPIKey = false || UserAPIKey = "")
+        return
+    ; Cast to string
+    UserAPIKey := UserAPIKey.Value
+    ; Pattern: Starts with "sk-", followed by alphanumeric characters, and has a total length of at least 20.
+    if (!RegExMatch(UserAPIKey, "^sk-[a-zA-Z0-9]{18,}$")) {
+        MsgBox("Error: Invalid API Key", "The API Key entered doesn't match the expected format. Please enter a valid OpenAI API Key.")
+        return
+    }
+    global API_Key := UserAPIKey
+    MsgBox("Success: API Key Updated", "Your API Key has been successfully updated.")
 }
 
+
 Exit(*) {
-	ExitApp
+    ExitApp
 }
 
 /*
@@ -69,6 +89,8 @@ MenuPopup.Add()
 MenuPopup.Add("&5 - Generate reply", GenerateReply)
 MenuPopup.Add("&6 - Find action items", FindActionItems)
 MenuPopup.Add("&7 - Translate to English", TranslateToEnglish)
+MenuPopup.Add("&8 - Convert to Markdown", ConvertToMarkdown)
+
 
 Rephrase(*) {
     ChatGPT_Prompt := "Rephrase the following text or paragraph to ensure clarity, conciseness, and a natural flow. The revision should preserve the tone, style, and formatting of the original text. Additionally, correct any grammar and spelling errors you come across:"
@@ -109,6 +131,12 @@ FindActionItems(*) {
 TranslateToEnglish(*) {
     ChatGPT_Prompt := "Generate an English translation for the following text or paragraph, ensuring the translation accurately conveys the intended meaning or idea without excessive deviation. The translation should preserve the tone, style, and formatting of the original text:"
     Status_Message := "Translating to English..."
+    ProcessRequest(ChatGPT_Prompt, Status_Message, Retry_Status)
+}
+
+ConvertToMarkdown(*) {
+    ChatGPT_Prompt := "Convert the following text or paragraph to Markdown. Reply only with the converted markdown and nothing else."
+    Status_Message := "Converting to Markdown..."
     ProcessRequest(ChatGPT_Prompt, Status_Message, Retry_Status)
 }
 
@@ -191,7 +219,7 @@ ProcessRequest(ChatGPT_Prompt, Status_Message, Retry_Status) {
         Response_Window_Status := "Open"
         RetryButton.Enabled := 0
         CopyButton.Enabled := 0
-    }    
+    }
     DllCall("SetFocus", "Ptr", 0)
 
     global HTTP_Request := ComObject("WinHttp.WinHttpRequest.5.1")
@@ -210,9 +238,9 @@ ProcessRequest(ChatGPT_Prompt, Status_Message, Retry_Status) {
     try {
         if (HTTP_Request.status == 200) {
             SafeArray := HTTP_Request.responseBody
-	    pData := NumGet(ComObjValue(SafeArray) + 8 + A_PtrSize, 'Ptr')
-	    length := SafeArray.MaxIndex() + 1
-	    JSON_Response := StrGet(pData, length, 'UTF-8')
+            pData := NumGet(ComObjValue(SafeArray) + 8 + A_PtrSize, 'Ptr')
+            length := SafeArray.MaxIndex() + 1
+            JSON_Response := StrGet(pData, length, 'UTF-8')
             var := Jxon_Load(&JSON_Response)
             JSON_Response := var.Get("choices")[1].Get("message").Get("content")
             RetryButton.Enabled := 1
@@ -250,7 +278,7 @@ Cursors
 
 WM_MOUSEHOVER(*) {
     Cursor := DllCall("LoadCursor", "uint", 0, "uint", 32648) ; Unavailable cursor
-    MouseGetPos ,,, &MousePosition
+    MouseGetPos , , , &MousePosition
     if (CopyButton.Enabled = 0) & (MousePosition = "Button2") {
         DllCall("SetCursor", "UPtr", Cursor)
     } else if (RetryButton.Enabled = 0) & (MousePosition = "Button1") | (MousePosition = "Button2") {
@@ -259,7 +287,7 @@ WM_MOUSEHOVER(*) {
 }
 
 LoadingCursor() {
-    MouseGetPos ,,, &MousePosition
+    MouseGetPos , , , &MousePosition
     if (MousePosition = "Edit1") {
         Cursor := DllCall("LoadCursor", "uint", 0, "uint", 32514) ; Loading cursor
         DllCall("SetCursor", "UPtr", Cursor)
@@ -272,4 +300,4 @@ Hotkey
 ====================================================
 */
 
-`::MenuPopup.Show()
+`:: MenuPopup.Show()
