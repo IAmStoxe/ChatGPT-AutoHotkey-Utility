@@ -16,6 +16,7 @@ A_TrayMenu.Delete
 A_TrayMenu.Add("&Debug", Debug)
 A_TrayMenu.Add("&API Key", EnterAPIKey)
 A_TrayMenu.Add("&Reload Script", ReloadScript)
+A_TrayMenu.Add("&Set Max Tokens", ChangeMaxTokens)
 A_TrayMenu.Add("E&xit", Exit)
 A_IconTip := "ChatGPT AutoHotkey Utility"
 
@@ -70,6 +71,7 @@ Variables
 API_Key := "Your_API_Key_Here"
 API_URL := "https://api.openai.com/v1/chat/completions"
 API_Model := "gpt-3.5-turbo"
+global MaxTokens := 500
 Status_Message := ""
 Response_Window_Status := "Closed"
 Retry_Status := ""
@@ -140,6 +142,27 @@ ConvertToMarkdown(*) {
     ProcessRequest(ChatGPT_Prompt, Status_Message, Retry_Status)
 }
 
+ChangeMaxTokens(*) {
+    UserInput := InputBox("Set Max Tokens", "Please enter the desired maximum number of tokens for regeneration:")
+    if (UserInput = false)
+        return
+
+    NewMaxTokens := UserInput.Value
+    if (IsNumber(NewMaxTokens)) {
+        global MaxTokens := NewMaxTokens
+        MsgBox("Success: Max Tokens Updated", "Max tokens have been updated to " . MaxTokens . ".")
+    }
+    else {
+        MsgBox("Error: Invalid Input", "Please enter a valid number.")
+    }
+}
+
+
+IsNumber(val) {
+    return RegExMatch(val, "^\d+$")
+}
+
+
 /*
 ====================================================
 Create Response Window
@@ -150,17 +173,29 @@ Response_Window := Gui("-Caption", "Response")
 Response_Window.BackColor := "0x333333"
 Response_Window.SetFont("s13 cWhite", "Georgia")
 Response := Response_Window.Add("Edit", "r20 ReadOnly w600 Wrap Background333333", Status_Message)
+
 RetryButton := Response_Window.Add("Button", "x190 Disabled", "Retry")
 RetryButton.OnEvent("Click", Retry)
 CopyButton := Response_Window.Add("Button", "x+30 w80 Disabled", "Copy")
 CopyButton.OnEvent("Click", Copy)
 Response_Window.Add("Button", "x+30", "Close").OnEvent("Click", Close)
 
+; new row (y) for buttons
+SetMaxTokensButton := Response_Window.Add("Button", "x190", "Set Max Tokens")
+SetMaxTokensButton.OnEvent("Click", ChangeMaxTokens)
+
+SetAPIKey := Response_Window.Add("Button", "x+30", "Set API Key")
+SetAPIKey.OnEvent("Click", EnterAPIKey)
+
+Response_Window.Show("Center", "Response")
+
+
 /*
 ====================================================
 Buttons
 ====================================================
 */
+
 
 Retry(*) {
     Retry_Status := "Retry"
@@ -227,7 +262,7 @@ ProcessRequest(ChatGPT_Prompt, Status_Message, Retry_Status) {
     HTTP_Request.SetRequestHeader("Content-Type", "application/json")
     HTTP_Request.SetRequestHeader("Authorization", "Bearer " API_Key)
     Messages := '{ "role": "user", "content": "' ChatGPT_Prompt '" }'
-    JSON_Request := '{ "model": "' API_Model '", "messages": [' Messages '] }'
+    JSON_Request := '{ "model": "' API_Model '", "messages": [' Messages '], "max_tokens": ' MaxTokens ' }'
     HTTP_Request.SetTimeouts(60000, 60000, 60000, 60000)
     HTTP_Request.Send(JSON_Request)
     SetTimer LoadingCursor, 1
